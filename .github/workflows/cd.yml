@@ -27,39 +27,30 @@ jobs:
       - run: npm test
   trivy:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Construire l'image backend
-        run: docker build -t backend-scan ./backend
+      - name: Construire les images
+        run: |
+          docker build -t backend-scan ./backend
+          docker build -t frontend-scan ./frontend
 
-      - name: Scanner l'image backend
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: backend-scan
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
-
-      - name: Construire l'image frontend
-        run: docker build -t frontend-scan ./frontend
-
-      - name: Scanner l'image frontend
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: frontend-scan
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+      - name: Scanner les images
+        run: |
+          for img in backend-scan frontend-scan; do
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest image \
+              --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+              "$img"
+          done
 
       - name: Scanner la configuration
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: config
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: "0"
+        run: |
+          docker run --rm -v "$PWD:/project" \
+            aquasec/trivy:latest config \
+            --severity HIGH,CRITICAL /project
   publish:
     needs: [test, trivy]
     runs-on: ubuntu-latest
