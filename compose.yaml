@@ -14,8 +14,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4201:80"              # 3. Port du frontend sur l'hôte
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
     depends_on:
-      - backend                  # 4. Service à démarrer avant le frontend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
 
 # 5. Quel nom de service le frontend doit-il utiliser
