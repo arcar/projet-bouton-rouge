@@ -1,0 +1,12 @@
+services:
+  backend:
+    image: ghcr.io/arcar/bouton-rouge-backend:latest
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/arcar/bouton-rouge-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
