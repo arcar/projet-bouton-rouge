@@ -22,6 +22,8 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      - name: Audit des dépendances
+        run: npm audit --omit=dev --audit-level=high
       - run: npm test
 
   publish:
