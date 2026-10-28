@@ -74,3 +74,15 @@ describe("POST /click", () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+describe("En-têtes de sécurité", () => {
+  it("n'expose pas X-Powered-By", async () => {
+    const res = await request(app).get("/health");
+    expect(res.headers["x-powered-by"]).toBeUndefined();
+  });
+
+  it("envoie X-Content-Type-Options: nosniff", async () => {
+    const res = await request(app).get("/health");
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+});
