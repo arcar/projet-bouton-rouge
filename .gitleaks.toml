@@ -1,0 +1,11 @@
+title = "Config gitleaks bouton-rouge"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Faux positifs connus"
+paths = [
+  '''package-lock\.json''',
+  '''coverage/.*''',
+]
