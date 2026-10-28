@@ -33,8 +33,8 @@ jobs:
 
       - name: Construire les images
         run: |
-          docker build -t backend-scan ./backend
-          docker build -t frontend-scan ./frontend
+          docker build --pull --no-cache -t backend-scan ./backend
+          docker build --pull --no-cache -t frontend-scan ./frontend
 
       - name: Scanner les images
         run: |
